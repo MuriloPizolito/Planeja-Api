@@ -1,5 +1,6 @@
 package br.com.murilo.planeja.infra.handlers;
 
+import br.com.murilo.planeja.common.exceptions.RegistroNaoEncontradoException;
 import br.com.murilo.planeja.common.exceptions.ValidationException;
 import br.com.murilo.planeja.common.validation.CampoInvalido;
 import org.springframework.http.HttpStatus;
@@ -41,6 +42,18 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(status).body(body);
+    }
+
+    @ExceptionHandler(RegistroNaoEncontradoException.class)
+    public ResponseEntity<?> handleRegistroNaoEncontradoException(RegistroNaoEncontradoException e) {
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of(
+                        "timestamp", LocalDateTime.now(),
+                        "status", HttpStatus.NOT_FOUND.value(),
+                        "error", e.getMessage(),
+                        "message", e.getMessage()
+                ));
     }
 
 

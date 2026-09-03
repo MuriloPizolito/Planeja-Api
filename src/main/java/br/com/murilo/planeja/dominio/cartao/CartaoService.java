@@ -1,5 +1,6 @@
 package br.com.murilo.planeja.dominio.cartao;
 
+import br.com.murilo.planeja.common.exceptions.RegistroNaoEncontradoException;
 import br.com.murilo.planeja.common.exceptions.ValidationException;
 import br.com.murilo.planeja.dominio.cartao.dto.CartaoDetalhes;
 import br.com.murilo.planeja.dominio.cartao.dto.CartaoForm;
@@ -7,6 +8,10 @@ import br.com.murilo.planeja.dominio.cartao.mapper.CartaoMapper;
 import br.com.murilo.planeja.dominio.cartao.model.CartaoEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class CartaoService {
@@ -21,7 +26,7 @@ public class CartaoService {
     private CartaoMapper mapper;
 
     public CartaoDetalhes criar(CartaoForm form) {
-        var result = validator.validar(form);
+        var result = validator.validar(form, null);
 
         if (result.isInvalido()) {
             throw new ValidationException(result.getCampoInvalidos());
@@ -33,5 +38,23 @@ public class CartaoService {
         return mapper.toDetalhes(entity);
     }
 
+    public CartaoDetalhes obterDetalhes(UUID id) {
+        return repository.findById(id)
+                .map(mapper::toDetalhes)
+                .orElseThrow(() -> new RegistroNaoEncontradoException());
+    }
+
+    @Transactional
+    public void atualizar(UUID id, CartaoForm dadosAtualizacao) {
+        var entity = repository.findById(id).orElseThrow(() -> new RegistroNaoEncontradoException());
+
+        var result = validator.validar(dadosAtualizacao, id);
+
+        if (result.isInvalido()) {
+            throw new ValidationException(result.getCampoInvalidos());
+        }
+
+        mapper.update(entity, dadosAtualizacao);
+    }
 
 }
