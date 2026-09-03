@@ -1,5 +1,6 @@
 package br.com.murilo.planeja.dominio.cartao;
 
+import br.com.murilo.planeja.common.exceptions.ValidationException;
 import br.com.murilo.planeja.dominio.cartao.dto.CartaoDetalhes;
 import br.com.murilo.planeja.dominio.cartao.dto.CartaoForm;
 import br.com.murilo.planeja.dominio.cartao.mapper.CartaoMapper;
@@ -20,7 +21,11 @@ public class CartaoService {
     private CartaoMapper mapper;
 
     public CartaoDetalhes criar(CartaoForm form) {
-        validator.validar(form);
+        var result = validator.validar(form);
+
+        if (result.isInvalido()) {
+            throw new ValidationException(result.getCampoInvalidos());
+        }
 
         CartaoEntity entity = mapper.toEntity(form);
 
