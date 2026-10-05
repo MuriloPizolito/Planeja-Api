@@ -7,10 +7,11 @@ import br.com.murilo.planeja.dominio.cartao.dto.CartaoForm;
 import br.com.murilo.planeja.dominio.cartao.mapper.CartaoMapper;
 import br.com.murilo.planeja.dominio.cartao.model.CartaoEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -55,6 +56,10 @@ public class CartaoService {
         }
 
         mapper.update(entity, dadosAtualizacao);
+    }
+
+    public Page<CartaoDetalhes> listar(PageRequest pageRequest) {
+        return repository.findAll(pageRequest).map(mapper::toDetalhes);
     }
 
 }
