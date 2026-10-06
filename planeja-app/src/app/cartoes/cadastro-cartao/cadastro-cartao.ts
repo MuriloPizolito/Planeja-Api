@@ -5,6 +5,8 @@ import { DadosCartaoForm, DetalhesCartao } from '../dados-cartao';
 import { ValidationErrorResponse } from '../../common/validation/validation-error-model';
 import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
+import { ActivatedRoute } from '@angular/router';
+import { Observable } from 'rxjs';
 
 interface CadastroCartaoForm{
   nome: FormControl<string>;
@@ -19,13 +21,38 @@ interface CadastroCartaoForm{
 })
 export class CadastroCartao implements  OnInit {
   form!: FormGroup<CadastroCartaoForm>;
+  rotaAtiva = inject(ActivatedRoute);
   service = inject(CartaoService);
   toast = inject(ToastrService)
+  idCartaoEdicao?: string | null;
 
   ngOnInit(): void {
     this.form = new FormGroup<CadastroCartaoForm>({
       nome: new FormControl('', {nonNullable: true, validators: Validators.required }),
       bandeira: new FormControl('', {nonNullable: true, validators: Validators.required})
+    });
+
+    this.carregarDadosParaEdicao();
+
+  }
+
+  carregarDadosParaEdicao(){
+    this.idCartaoEdicao = this.rotaAtiva.snapshot.queryParamMap.get('id');
+
+    if (!this.idCartaoEdicao) {
+      return;
+    }
+
+    this.service
+    .obterPorId(this.idCartaoEdicao)
+    .subscribe({
+      next: (cartao) => {
+        this.form.patchValue({
+          nome: cartao.nome,
+          bandeira: cartao.bandeira
+        })
+      },
+      error: () => this.toast.error('Erro ao carregar dados do cartão')
     });
   }
 
@@ -45,14 +72,18 @@ export class CadastroCartao implements  OnInit {
     }
 
     const dadosCartao = this.form.value as DadosCartaoForm;
-    this.service.criar(dadosCartao)
-    .subscribe({
-      next: (response: DetalhesCartao) => {
-        console.log('recebendo a resposta do servidor: ', response);
-        this.toast.success("Cartão cadastrado/atualizado com sucesso!");
-      },
-      error: (error) => this.onApiError(error)
-    });
+
+    const requisicao: Observable<DetalhesCartao | void> = this.idCartaoEdicao ? 
+          this.service.atualizar(this.idCartaoEdicao, dadosCartao) :
+          this.service.criar(dadosCartao);
+
+    requisicao
+      .subscribe({
+        next: (response) => {
+          this.toast.success("Cartão cadastrado/atualizado com sucesso!");
+        },
+        error: (error) => this.onApiError(error)
+      });
 
   }
 
