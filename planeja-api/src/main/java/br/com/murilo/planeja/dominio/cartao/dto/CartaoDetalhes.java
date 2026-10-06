@@ -8,5 +8,6 @@ public record CartaoDetalhes(
         String id,
         String nome,
         BandeiraCartao bandeira,
-        LocalDateTime dataCadastro) {
+        LocalDateTime dataCadastro,
+        Boolean ativo) {
 }
