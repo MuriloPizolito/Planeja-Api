@@ -27,6 +27,9 @@ public class CartaoEntity {
     @Column(name = "data_cadastro")
     private LocalDateTime dataCadastro;
 
+    @Column(name = "ativo")
+    private Boolean ativo = true;
+
     @PrePersist // executa antes de persistir os dados no banco
     public void prePersist() {
         setDataCadastro(LocalDateTime.now());
