@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -63,7 +64,7 @@ public class CartaoService {
     }
 
     @Transactional
-    public void mudarStatus(UUID id){
+    public void mudarStatus(UUID id) {
         var cartao = repository.findById(id).orElseThrow(RegistroNaoEncontradoException::new);
 
         cartao.setAtivo(!cartao.getAtivo());
@@ -72,4 +73,7 @@ public class CartaoService {
         repository.save(cartao);
     }
 
+    public List<CartaoDetalhes> listarAtivos() {
+        return repository.findByAtivoTrue().stream().map(mapper::toDetalhes).toList();
+    }
 }

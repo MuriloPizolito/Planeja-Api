@@ -19,6 +19,8 @@ public interface CartaoRepository extends JpaRepository<CartaoEntity, UUID> {
             where ( :id is null or c.id != :id )
             and c.nome = :nome
             """)
-    List<CartaoEntity> findByNomeAndNotId(@Param("nome") String nome,@Param("id") UUID id);
+    List<CartaoEntity> findByNomeAndNotId(@Param("nome") String nome, @Param("id") UUID id);
+
+    List<CartaoEntity> findByAtivoTrue();
 
 }
