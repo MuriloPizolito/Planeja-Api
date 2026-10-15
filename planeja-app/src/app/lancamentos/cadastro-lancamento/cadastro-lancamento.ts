@@ -8,6 +8,7 @@ import { DetalhesCartao } from '../../cartoes/dados-cartao';
 import { forkJoin } from 'rxjs'
 import { Header } from '../../common/components/header/header';
 import { CommonModule } from '@angular/common';
+import { NgxMaskDirective } from 'ngx-mask';
 
 interface CadastroLancamentoForm{
   categoriaId: FormControl<string>;
@@ -19,7 +20,7 @@ interface CadastroLancamentoForm{
 
 @Component({
   selector: 'app-cadastro-lancamento',
-  imports: [Header, ReactiveFormsModule, CommonModule],
+  imports: [Header, ReactiveFormsModule, CommonModule, NgxMaskDirective],
   templateUrl: './cadastro-lancamento.html',
   styleUrl: './cadastro-lancamento.scss',
 })
@@ -35,7 +36,7 @@ export class CadastroLancamento implements OnInit{
     this.form = new FormGroup<CadastroLancamentoForm>({
       categoriaId: new FormControl<string>('', {nonNullable: true, validators: Validators.required}),
       data: new FormControl<string>('', {nonNullable: true, validators: Validators.required}),
-      valor: new FormControl<string>('', {nonNullable: true, validators: Validators.required}),
+      valor: new FormControl<string>('', {nonNullable: true, validators: [Validators.required, Validators.min(1)] }),
       tipo: new FormControl<TipoLancamento | ''>('', {nonNullable: true, validators: Validators.required}),
       cartaoId: new FormControl<string>('', {nonNullable: true})
     });
@@ -56,7 +57,31 @@ export class CadastroLancamento implements OnInit{
     })
   }
 
+  isDespesa() : boolean{
+    return this.form.controls.tipo.value ===  'DESPESA';
+  }
+
+  handleTipoChange() : void {
+    if(!this.isDespesa()){
+      this.form.controls.cartaoId.setValue('');
+      this.form.controls.cartaoId.setErrors(null);
+    }
+  }
+
+    isFormInvalid () : boolean {
+    if(this.form.invalid){
+      this.form.markAllAsTouched();
+      this.toast.error("Erro de validação. Verifique os valores informados.");
+      return true;
+    }
+
+    return false;
+  }
+
   handleSubmit(){
+    if(this.isFormInvalid()){
+      return;
+    }
     console.log(this.form.value);
   }
 
