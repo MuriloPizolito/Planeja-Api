@@ -9,8 +9,17 @@ import br.com.murilo.planeja.dominio.lancamento.dto.LancamentoDetalhes;
 import br.com.murilo.planeja.dominio.lancamento.dto.LancamentoForm;
 import br.com.murilo.planeja.dominio.lancamento.mapper.LancamentoMapper;
 import br.com.murilo.planeja.dominio.lancamento.model.LancamentoEntity;
+import br.com.murilo.planeja.dominio.lancamento.model.TipoLancamento;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
+import java.time.YearMonth;
+import java.util.UUID;
+
+import static br.com.murilo.planeja.dominio.lancamento.LancamentoSpecs.*;
 
 @Service
 public class LancamentoService {
@@ -49,9 +58,27 @@ public class LancamentoService {
         return mapper.toDetalhes(entity);
     }
 
+    public Page<LancamentoDetalhes> listar(PageRequest pageRequest, YearMonth mes, TipoLancamento tipo, UUID categoriaId) {
+        // select * from LancamentoEntity where 1 = 1
+        Specification<LancamentoEntity> spec = Specification.unrestricted();
 
+        if (tipo != null) {
+            // and tipo = :tipo
+            spec = spec.and(tipoEqual(tipo));
+        }
 
+        if (categoriaId != null) {
+            spec = spec.and(categoriaEqual(categoriaId));
+        }
 
+        if (mes != null) {
+            spec = spec.and(mesEqual(mes));
+        }
+
+        var resultado = repository.findAll(spec, pageRequest);
+
+        return resultado.map(mapper::toDetalhes);
+    }
 
 
 }

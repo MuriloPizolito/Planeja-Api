@@ -9,6 +9,7 @@ public record LancamentoDetalhes(
         String id,
         LocalDate data,
         BigDecimal valor,
+        String descricao,
         TipoLancamento tipo,
         String categoriaId,
         String categoriaNome,
