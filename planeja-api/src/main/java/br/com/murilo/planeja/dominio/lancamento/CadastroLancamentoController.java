@@ -9,14 +9,12 @@ import br.com.murilo.planeja.dominio.lancamento.dto.LancamentoForm;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("lancamentos")
-@CrossOrigin("*")
 public class CadastroLancamentoController {
 
     @Autowired
@@ -28,7 +26,7 @@ public class CadastroLancamentoController {
     @Autowired
     private CartaoService cartaoService;
 
-//    @PostMapping
+    //    @PostMapping
 //    public ResponseEntity<LancamentoDetalhes> criar(@RequestBody @Valid LancamentoForm form){
 //        var detalhes = service.criar(form);
 //
@@ -37,18 +35,18 @@ public class CadastroLancamentoController {
     // outra maneira de fazer
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public LancamentoDetalhes criar(@RequestBody @Valid LancamentoForm form){
+    public LancamentoDetalhes criar(@RequestBody @Valid LancamentoForm form) {
         return service.criar(form);
     }
 
 
     @GetMapping("categorias-disponiveis")
-    public List<CategoriaDetalhes> listarCategoriasDisponiveis(){
+    public List<CategoriaDetalhes> listarCategoriasDisponiveis() {
         return categoriaService.listarAtivas();
     }
 
     @GetMapping("cartoes-disponiveis")
-    public List<CartaoDetalhes> listarCartoesDisponiveis(){
+    public List<CartaoDetalhes> listarCartoesDisponiveis() {
         return cartaoService.listarAtivos();
     }
 

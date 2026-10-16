@@ -14,7 +14,6 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("cartoes")
-@CrossOrigin("*") // só para testes na aula
 public class CartaoController {
 
     @Autowired
