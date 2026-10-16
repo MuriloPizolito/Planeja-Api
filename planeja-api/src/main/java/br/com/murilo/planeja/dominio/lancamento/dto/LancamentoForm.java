@@ -2,6 +2,7 @@ package br.com.murilo.planeja.dominio.lancamento.dto;
 
 import br.com.murilo.planeja.dominio.lancamento.model.TipoLancamento;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
@@ -12,6 +13,9 @@ public record LancamentoForm(
 
         @NotNull(message = "Campo obrigatório.")
         UUID categoriaId,
+
+        @NotBlank(message = "Campo obrigatório.")
+        String descricao,
 
         @NotNull(message = "Campo obrigatório.")
         TipoLancamento tipo,
