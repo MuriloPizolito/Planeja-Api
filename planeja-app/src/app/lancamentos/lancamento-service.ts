@@ -51,4 +51,8 @@ export class LancamentoService {
   listarCategoriasParaFiltrar() : Observable<DetalhesCategoria[]> {
     return this.http.get<DetalhesCategoria[]>(`${this.baseUrl}/categorias-listagem`);
   }
+
+  deletar(id: string) : Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
 }

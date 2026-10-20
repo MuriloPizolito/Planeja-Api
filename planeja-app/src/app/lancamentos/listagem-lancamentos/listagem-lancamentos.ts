@@ -77,4 +77,51 @@ export class ListagemLancamentos implements OnInit{
     this.form.reset();
   }
 
+  deletar(id: string) : void{
+    this.service.deletar(id).subscribe({
+      next: () => {
+        this.toast.success('Lançamento excluído com sucesso!');
+        this.listarLancamentos();
+      },
+      error: () => this.toast.error('Erro ao excluir lançamento.')
+    });
+  }
+
+  navegar(pagina: number) : void{
+    this.paginaAtual = pagina;
+    this.listarLancamentos();
+  }
+
+  navegarProximo(listagem: PageResult<DetalhesLancamento>) : void {
+    if(!listagem.last){
+      this.navegar(listagem.number + 1);
+    }
+  }
+
+    navegarAnterior(listagem: PageResult<DetalhesLancamento>) : void {
+    if(!listagem.first){
+      this.navegar(listagem.number - 1);
+    }
+  }
+
+  paginas(totalPages: number) : number[] {
+    return Array.from({ length: totalPages }, (_value, index) => index);
+  }
+
+  registroInicial(listagem: PageResult<DetalhesLancamento>) : number {
+    if(listagem.totalElements === 0){
+      return 0;
+    }
+
+    return listagem.number * listagem.size + 1; 
+  }
+
+    registroFinal(listagem: PageResult<DetalhesLancamento>) : number {
+    if(listagem.totalElements === 0){
+      return 0;
+    }
+
+    return Math.min( (listagem.number + 1 ) * listagem.size, listagem.totalElements ); 
+  }
+
 }

@@ -1,5 +1,6 @@
 package br.com.murilo.planeja.dominio.lancamento;
 
+import br.com.murilo.planeja.common.exceptions.RegistroNaoEncontradoException;
 import br.com.murilo.planeja.common.exceptions.ValidationException;
 import br.com.murilo.planeja.dominio.cartao.CartaoRepository;
 import br.com.murilo.planeja.dominio.cartao.model.CartaoEntity;
@@ -78,6 +79,11 @@ public class LancamentoService {
         var resultado = repository.findAll(spec, pageRequest);
 
         return resultado.map(mapper::toDetalhes);
+    }
+
+    public void deletar(UUID id){
+        var lancamento = repository.findById(id).orElseThrow(RegistroNaoEncontradoException::new);
+        repository.delete(lancamento);
     }
 
 
