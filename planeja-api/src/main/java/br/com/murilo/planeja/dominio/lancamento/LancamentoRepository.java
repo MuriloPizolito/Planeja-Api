@@ -15,7 +15,7 @@ import java.util.UUID;
 public interface LancamentoRepository extends JpaRepository<LancamentoEntity, UUID>, JpaSpecificationExecutor<LancamentoEntity> {
 
     @Query("""
-            select sum(l.valor)
+            select coalesce(sum(l.valor), 0)
             from LancamentoEntity as l
             where l.tipo = :tipo
             and l.data between :inicio and :fim
@@ -23,7 +23,7 @@ public interface LancamentoRepository extends JpaRepository<LancamentoEntity, UU
     BigDecimal somaPorTipoNoPeriodo(@Param("tipo") TipoLancamento tipo, @Param("inicio") LocalDate inicio, @Param("fim") LocalDate fim);
 
     @Query("""
-            select l.categoria.nome, sum(l.valor)
+            select l.categoria.nome, coalesce(sum(l.valor), 0)
             from LancamentoEntity as l
             where l.tipo = :tipo
             and l.data between :inicio and :fim
