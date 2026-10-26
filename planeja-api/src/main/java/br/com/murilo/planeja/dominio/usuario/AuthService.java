@@ -7,6 +7,7 @@ import br.com.murilo.planeja.dominio.usuario.dto.AuthResponse;
 import br.com.murilo.planeja.dominio.usuario.dto.LoginForm;
 import br.com.murilo.planeja.dominio.usuario.dto.UsuarioCadastroForm;
 import br.com.murilo.planeja.dominio.usuario.model.UsuarioEntity;
+import br.com.murilo.planeja.infra.security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,9 @@ public class AuthService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private JwtService jwtService;
 
     public AuthResponse cadastrar(UsuarioCadastroForm form) {
         if (usuarioRepository.existsByLogin(form.login())) {
@@ -38,7 +42,7 @@ public class AuthService {
         return toAuthResponse(usuario);
     }
 
-    public AuthResponse autenticaar(LoginForm form) {
+    public AuthResponse autenticar(LoginForm form) {
         final String mensagem = "Login ou senha inválidos.";
         UsuarioEntity usuario = usuarioRepository.findByLogin(form.login()).orElseThrow(() -> new UnauthorizedException(mensagem)); //nunca informar diretamente se é a senha ou o login que está incorreto
 
@@ -50,12 +54,14 @@ public class AuthService {
         return toAuthResponse(usuario);
     }
 
-
     private AuthResponse toAuthResponse(UsuarioEntity usuario) {
+       var token = jwtService.gerarToken(usuario);
+       var expiraEm = jwtService.getExpirationSeconds();
+
         return new AuthResponse(
-                null,
+                token,
                 "Bearer",
-                0,
+                expiraEm,
                 usuario.getNome()
         );
     }

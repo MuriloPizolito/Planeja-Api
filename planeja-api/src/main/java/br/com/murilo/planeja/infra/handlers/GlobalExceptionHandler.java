@@ -1,6 +1,7 @@
 package br.com.murilo.planeja.infra.handlers;
 
 import br.com.murilo.planeja.common.exceptions.RegistroNaoEncontradoException;
+import br.com.murilo.planeja.common.exceptions.UnauthorizedException;
 import br.com.murilo.planeja.common.exceptions.ValidationException;
 import br.com.murilo.planeja.common.validation.CampoInvalido;
 import org.springframework.http.HttpStatus;
@@ -64,6 +65,19 @@ public class GlobalExceptionHandler {
                 .body(Map.of(
                         "timestamp", LocalDateTime.now(),
                         "status", e.getStatusCode(),
+                        "error", e.getMessage(),
+                        "message", e.getMessage()
+                ));
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<?> handleUnauthorizedException(UnauthorizedException e) {
+        var status = HttpStatus.UNAUTHORIZED;
+
+        return ResponseEntity.status(status)
+                .body(Map.of(
+                        "timestamp", LocalDateTime.now(),
+                        "status", status.value(),
                         "error", e.getMessage(),
                         "message", e.getMessage()
                 ));

@@ -18,3 +18,8 @@ spring:
     console:
       enabled: true
       path: /h2-console
+
+app:
+  jwt:
+    secret: TyBzb2wgw6kgYW1hcmVsbwo=  # Definir nas variáveis de ambiente do sistema
+    expiration-seconds: 3600
