@@ -1,14 +1,19 @@
 package br.com.murilo.planeja.infra.security;
 
+import br.com.murilo.planeja.dominio.usuario.UsuarioRepository;
 import br.com.murilo.planeja.dominio.usuario.model.UsuarioEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.UUID;
 
 @Service
 public class JwtService {
@@ -20,6 +25,9 @@ public class JwtService {
 
     @Value("${app.jwt.expiration-seconds}")
     private Long expirationSeconds;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     public Long getExpirationSeconds() {
         return expirationSeconds;
@@ -57,5 +65,46 @@ public class JwtService {
         return Base64.getUrlEncoder()
                 .withoutPadding()
                 .encodeToString(valor.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public boolean isTokenValido(String token) {
+        try {
+            String[] parteDoToken = token.split("\\.");
+            String header = parteDoToken[0];
+            String payload = parteDoToken[1];
+
+            String assinaturaEsperada = this.assinar(header + "." + payload);
+            if (!assinaturaEsperada.equals(parteDoToken[2])) {
+                return false;
+            }
+
+            var payloadDecodificado = Base64.getUrlDecoder().decode(payload);
+            var payloadString = new String(payloadDecodificado, StandardCharsets.UTF_8);
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode json = objectMapper.readTree(payloadString);
+            long expiraEm = json.get("exp").asLong();
+
+            long miliSegundoDataHoraAtual = Instant.now().getEpochSecond();
+
+            return miliSegundoDataHoraAtual < expiraEm;
+        } catch (RuntimeException e) {
+            return false;
+        }
+    }
+
+    public UsuarioEntity getUsuario(String token) {
+        String[] parteDoToken = token.split("\\.");
+        byte[] payloadDecodificado = Base64.getUrlDecoder().decode(parteDoToken[1]);
+        String payload = new String(payloadDecodificado, StandardCharsets.UTF_8);
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode json = mapper.readTree(payload);
+
+        String id = json.get("sub").asString();
+
+        var usuario = usuarioRepository.findById(UUID.fromString(id)).orElseThrow(() -> new RuntimeException("Erro ao tentar resolver usuário."));
+
+        return usuario;
     }
 }
