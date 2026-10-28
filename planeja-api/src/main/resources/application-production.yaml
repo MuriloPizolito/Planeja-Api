@@ -2,7 +2,7 @@ spring:
   application:
     name: planeja-api
   datasource:
-    url: jdbc:postgresql://localhost:5435/planeja
+    url: jdbc:postgresql://planeja-postgres:5432/planeja
     driver-class-name: org.postgresql.Driver
     username: planeja
     password: planeja123
