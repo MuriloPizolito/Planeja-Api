@@ -220,5 +220,5 @@ Projeto desenvolvido durante o curso **Angular 21 + Spring Boot 4 Fullstack do Z
 
 **Murilo Pizolito**
 
-- GitHub
-- LinkedIn
+- [LinkedIn](https://www.linkedin.com/in/murilopizolito/)
+- murilopizolito@gmail.com
